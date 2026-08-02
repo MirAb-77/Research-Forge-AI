@@ -1,0 +1,19 @@
+use_default_settings: true
+
+general:
+  debug: false
+  instance_name: "research-searxng"
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  formats:
+    - html
+    - json   # REQUIRED: enables ?format=json for our Django client
+
+server:
+  secret_key: "change-this-secret-key-in-production"
+  limiter: false   # disable rate limiter for local/internal use
+  image_proxy: false
+
+# Keep default engine set from base image; trim if you want fewer/faster results.

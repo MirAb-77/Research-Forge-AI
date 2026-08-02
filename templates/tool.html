@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Research Ledger — AI Research Assistant</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='16' fill='%23171B21'/%3E%3Ctext x='50' y='68' font-size='58' text-anchor='middle' fill='%23A9700A' font-family='Georgia,serif'%3E§%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F5F6F3;
+    --card:#FFFFFF;
+    --ink:#171B21;
+    --ink-soft:#5B6472;
+    --line:#DDE1E6;
+    --marker:#A9700A;
+    --marker-soft:#F3E6D0;
+    --teal:#1C6B67;
+    --teal-soft:#E4EFEE;
+    --red:#B3261E;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      linear-gradient(var(--paper) 1px, transparent 1px) 0 0/100% 28px,
+      var(--paper);
+    color:var(--ink);
+    font-family:'IBM Plex Sans', sans-serif;
+    font-size:15px;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:1080px; margin:0 auto; padding:48px 24px 80px; }
+
+  /* ---------- Top nav ---------- */
+  .topnav{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:28px; padding-bottom:16px; border-bottom:1px solid var(--line);
+  }
+  .topnav a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px; color:var(--ink-soft); text-decoration:none;
+    transition:color .15s ease;
+  }
+  .topnav a:hover{ color:var(--ink); }
+  .topnav-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--marker); background:var(--marker-soft);
+    padding:3px 8px; border-radius:2px;
+  }
+
+  /* ---------- Header ---------- */
+  header{ margin-bottom:36px; }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--teal);
+    display:flex; align-items:center; gap:10px;
+    margin-bottom:10px;
+  }
+  .eyebrow::before{
+    content:''; width:7px; height:7px; background:var(--teal); border-radius:50%; display:inline-block;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    font-weight:600;
+    font-size:clamp(32px, 5vw, 46px);
+    line-height:1.05;
+    margin:0 0 10px;
+    letter-spacing:-.01em;
+  }
+  header p{
+    color:var(--ink-soft);
+    max-width:560px;
+    margin:0;
+    line-height:1.5;
+  }
+
+  /* ---------- Input card ---------- */
+  .composer{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:20px;
+    box-shadow:0 1px 0 rgba(23,27,33,.03);
+  }
+  .composer label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:8px;
+  }
+  textarea{
+    width:100%;
+    min-height:76px;
+    resize:vertical;
+    border:none;
+    outline:none;
+    font-family:'Fraunces', serif;
+    font-size:19px;
+    line-height:1.4;
+    color:var(--ink);
+    background:transparent;
+    padding:0;
+  }
+  textarea::placeholder{ color:#9CA3AF; }
+  .composer-footer{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-top:14px; padding-top:14px; border-top:1px dashed var(--line);
+  }
+  .hint{ font-family:'IBM Plex Mono', monospace; font-size:11.5px; color:var(--ink-soft); }
+  button.run{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:13px; font-weight:500;
+    letter-spacing:.04em;
+    background:var(--ink); color:var(--paper);
+    border:none; border-radius:3px;
+    padding:11px 20px;
+    cursor:pointer;
+    transition:background .15s ease, transform .1s ease;
+  }
+  button.run:hover{ background:#2b323d; }
+  button.run:active{ transform:translateY(1px); }
+  button.run:disabled{ background:#9CA3AF; cursor:not-allowed; }
+
+  /* ---------- Pipeline rail ---------- */
+  .rail{
+    display:flex; align-items:center;
+    margin:34px 0 30px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    letter-spacing:.03em;
+  }
+  .rail-step{
+    display:flex; align-items:center; gap:8px;
+    color:#B0B6BE;
+    white-space:nowrap;
+  }
+  .rail-step .dot{
+    width:8px; height:8px; border-radius:50%;
+    border:1.5px solid #C7CCD2; background:transparent;
+    flex-shrink:0;
+  }
+  .rail-step.done{ color:var(--teal); }
+  .rail-step.done .dot{ background:var(--teal); border-color:var(--teal); }
+  .rail-step.active{ color:var(--ink); }
+  .rail-step.active .dot{
+    background:var(--marker); border-color:var(--marker);
+    box-shadow:0 0 0 3px var(--marker-soft);
+  }
+  .rail-step.failed{ color:var(--red); }
+  .rail-step.failed .dot{ background:var(--red); border-color:var(--red); }
+  .rail-line{ flex:1; height:1px; background:var(--line); margin:0 10px; min-width:14px; }
+  .rail-wrap{ display:none; }
+  .rail-wrap.show{ display:flex; }
+
+  .status-msg{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    color:var(--red);
+    margin:-10px 0 24px;
+    display:none;
+  }
+  .status-msg.show{ display:block; }
+
+  /* ---------- Results ---------- */
+  .results{ display:none; }
+  .results.show{ display:flex; flex-direction:column; gap:28px; }
+
+  .answer-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:4px;
+    padding:28px 34px;
+    width:100%;
+  }
+  .answer-card h2{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-soft); margin:0 0 16px;
+  }
+  .answer-body{
+    font-family:'Fraunces', serif;
+    font-size:17px;
+    line-height:1.65;
+    color:var(--ink);
+  }
+  .answer-body p{ margin:0 0 16px; }
+  .answer-body strong{ font-weight:600; }
+  .cite{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11.5px;
+    color:var(--marker);
+    background:var(--marker-soft);
+    border-radius:2px;
+    padding:1px 5px;
+    margin:0 1px;
+    cursor:pointer;
+    white-space:nowrap;
+    transition:background .15s ease;
+  }
+  .cite:hover{ background:#e7d2a8; }
+
+  .downloads{
+    display:flex; gap:10px; margin-top:24px; padding-top:20px; border-top:1px dashed var(--line);
+  }
+  .downloads a{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12.5px;
+    text-decoration:none;
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:3px;
+    padding:9px 14px;
+    transition:border-color .15s ease, background .15s ease;
+  }
+  .downloads a:hover{ border-color:var(--ink); background:#fafafa; }
+
+  /* ---------- Ledger ---------- */
+  .ledger{ width:100%; }
+  .ledger h2{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--ink-soft); margin:0 0 14px;
+  }
+  #refList{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:12px;
+  }
+  .ref-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-left:3px solid var(--line);
+    border-radius:3px;
+    padding:12px 14px;
+    transition:border-left-color .25s ease, background .25s ease;
+  }
+  .ref-card.flash{
+    border-left-color:var(--marker);
+    background:var(--marker-soft);
+  }
+  .ref-num{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; color:var(--marker); font-weight:600;
+    margin-right:4px;
+  }
+  .ref-title{ font-size:13.5px; font-weight:500; line-height:1.35; }
+  .ref-card a{
+    display:block; margin-top:5px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px; color:var(--teal); text-decoration:none;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .ref-card a:hover{ text-decoration:underline; }
+
+  ::selection{ background:var(--marker-soft); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <nav class="topnav">
+    <a href="/">← Research Forge AI</a>
+    <span class="topnav-tag">Research Ledger</span>
+  </nav>
+
+  <header>
+    <div class="eyebrow">SearXNG · RAG · Citation Engine</div>
+    <h1>Research Ledger</h1>
+    <p>Ask a question. It searches the open web, reads the sources, and answers with every claim traced back to a numbered reference — like a footnoted brief, not a guess.</p>
+  </header>
+
+  <div class="composer">
+    <label for="question">Your question</label>
+    <textarea id="question" placeholder="e.g. What are the latest developments in small modular reactors?"></textarea>
+    <div class="composer-footer">
+      <span class="hint" id="hint">⏎ backend runs search → scrape → embed → generate → report</span>
+      <button class="run" id="submitBtn">Run research</button>
+    </div>
+  </div>
+
+  <div class="rail-wrap" id="railWrap">
+    <div class="rail" id="rail">
+      <div class="rail-step" data-stage="searching"><span class="dot"></span>search</div>
+      <div class="rail-line"></div>
+      <div class="rail-step" data-stage="scraping"><span class="dot"></span>scrape</div>
+      <div class="rail-line"></div>
+      <div class="rail-step" data-stage="embedding"><span class="dot"></span>embed</div>
+      <div class="rail-line"></div>
+      <div class="rail-step" data-stage="generating"><span class="dot"></span>generate</div>
+      <div class="rail-line"></div>
+      <div class="rail-step" data-stage="done"><span class="dot"></span>report</div>
+    </div>
+  </div>
+  <div class="status-msg" id="statusMsg"></div>
+
+  <div class="results" id="results">
+    <div class="ledger">
+      <h2>Sources cited</h2>
+      <div id="refList"></div>
+    </div>
+    <div class="answer-card">
+      <h2>Answer</h2>
+      <div class="answer-body" id="answerBody"></div>
+      <div class="downloads" id="downloads"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const submitBtn = document.getElementById('submitBtn');
+const questionEl = document.getElementById('question');
+const railWrap = document.getElementById('railWrap');
+const rail = document.getElementById('rail');
+const statusMsg = document.getElementById('statusMsg');
+const results = document.getElementById('results');
+const answerBody = document.getElementById('answerBody');
+const refList = document.getElementById('refList');
+const downloads = document.getElementById('downloads');
+
+const STAGES = ['searching', 'scraping', 'embedding', 'generating', 'done'];
+
+submitBtn.addEventListener('click', runQuery);
+questionEl.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) runQuery();
+});
+
+async function runQuery() {
+  const question = questionEl.value.trim();
+  if (!question) return;
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = 'Running…';
+  statusMsg.classList.remove('show');
+  results.classList.remove('show');
+  railWrap.classList.add('show');
+  setStage('searching');
+
+  try {
+    const res = await fetch('/api/query', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({question})
+    });
+    const data = await res.json();
+    poll(data.id);
+  } catch (err) {
+    showError('Could not reach the server. Is Django running?');
+  }
+}
+
+async function poll(id) {
+  try {
+    const res = await fetch(`/api/query/${id}`);
+    const data = await res.json();
+
+    if (data.status === 'failed') {
+      showError(data.error_message || 'The pipeline failed.');
+      return;
+    }
+    if (data.status === 'done') {
+      setStage('done');
+      renderResult(data);
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Run research';
+      return;
+    }
+    setStage(data.status);
+    setTimeout(() => poll(id), 1800);
+  } catch (err) {
+    showError('Lost connection while polling for results.');
+  }
+}
+
+function setStage(stage) {
+  const idx = STAGES.indexOf(stage);
+  rail.querySelectorAll('.rail-step').forEach((el) => {
+    const stepIdx = STAGES.indexOf(el.dataset.stage);
+    el.classList.remove('done', 'active', 'failed');
+    if (stepIdx < idx) el.classList.add('done');
+    else if (stepIdx === idx) el.classList.add('active');
+  });
+}
+
+function showError(message) {
+  statusMsg.textContent = `⚠ ${message}`;
+  statusMsg.classList.add('show');
+  rail.querySelectorAll('.rail-step').forEach((el) => el.classList.add('failed'));
+  submitBtn.disabled = false;
+  submitBtn.textContent = 'Run research';
+}
+
+function renderResult(data) {
+  const report = data.report;
+  const references = report.references_json || [];
+
+  answerBody.innerHTML = formatAnswer(extractAnswerBody(report.answer_markdown), references);
+  results.classList.add('show');
+
+  refList.innerHTML = references.map((r) => `
+    <div class="ref-card" id="ref-${r.index}">
+      <span class="ref-num">[${r.index}]</span><span class="ref-title">${escapeHtml(r.title)}</span>
+      <a href="${r.url}" target="_blank" rel="noopener">${escapeHtml(r.url)}</a>
+    </div>
+  `).join('') || '<p style="color:var(--ink-soft); font-size:13px;">No sources were cited.</p>';
+
+  downloads.innerHTML = `
+    ${report.pdf_url ? `<a href="${report.pdf_url}" target="_blank">↓ Download PDF</a>` : ''}
+    ${report.docx_url ? `<a href="${report.docx_url}" target="_blank">↓ Download DOCX</a>` : ''}
+  `;
+
+  document.querySelectorAll('.cite').forEach((el) => {
+    el.addEventListener('click', () => {
+      const nums = el.dataset.refs.split(',');
+      nums.forEach((n) => {
+        const card = document.getElementById(`ref-${n}`);
+        if (card) {
+          card.scrollIntoView({behavior:'smooth', block:'center'});
+          card.classList.add('flash');
+          setTimeout(() => card.classList.remove('flash'), 1200);
+        }
+      });
+    });
+  });
+}
+
+// Pull just the generated answer out of the full report markdown
+// (build_markdown wraps it in a title + question + a References section).
+function extractAnswerBody(md) {
+  if (!md) return '';
+  const afterHeader = md.indexOf('---');
+  let body = afterHeader !== -1 ? md.slice(afterHeader + 3) : md;
+  const refIdx = body.lastIndexOf('## References');
+  if (refIdx !== -1) body = body.slice(0, refIdx);
+  body = body.replace(/\n-{3,}\s*$/, '');
+  return body.trim();
+}
+
+// Minimal markdown-ish rendering: paragraphs, bold, and [n] citation pills.
+function formatAnswer(text, references) {
+  const validIndices = new Set(references.map((r) => String(r.index)));
+  const escaped = escapeHtml(text);
+
+  const withCitations = escaped.replace(/((?:\[\d+\])+)/g, (match) => {
+    const nums = [...match.matchAll(/\[(\d+)\]/g)].map((m) => m[1]).filter((n) => validIndices.has(n));
+    if (!nums.length) return match;
+    return `<span class="cite" data-refs="${nums.join(',')}">${match}</span>`;
+  });
+
+  return withCitations
+    .split(/\n\s*\n/)
+    .map((para) => para.trim())
+    .filter(Boolean)
+    .map((para) => `<p>${para.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>')}</p>`)
+    .join('');
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str;
+  return div.innerHTML;
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+version: "3.9"
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: searxng
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./searxng-config:/etc/searxng
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8080/
+    restart: unless-stopped
+
+  redis:
+    image: redis:7-alpine
+    container_name: research_redis
+    ports:
+      - "6379:6379"
+    restart: unless-stopped
+
+  web:
+    build: .
+    container_name: research_django
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - SEARXNG_URL=http://searxng:8080
+      - REDIS_URL=redis://redis:6379/0
+      - DEBUG=1
+    depends_on:
+      - searxng
+      - redis
+
+  celery_worker:
+    build: .
+    container_name: research_celery
+    command: celery -A config worker -l info
+    volumes:
+      - .:/app
+    environment:
+      - SEARXNG_URL=http://searxng:8080
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - redis
+      - web
