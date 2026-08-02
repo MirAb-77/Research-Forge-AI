@@ -18,8 +18,6 @@ Everything runs on infrastructure you own — no paid search API, no paid embedd
   <img src="https://img.shields.io/badge/Celery-5.4-37814A?style=for-the-badge&logo=celery&logoColor=white" alt="Celery" />
   <img src="https://img.shields.io/badge/Redis-broker-DC382D?style=for-the-badge&logo=redis&logoColor=white" alt="Redis" />
   <img src="https://img.shields.io/badge/Docker-Compose-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
-</p>
-<p>
   <img src="https://img.shields.io/badge/SearXNG-meta--search-3050FF?style=for-the-badge" alt="SearXNG" />
   <img src="https://img.shields.io/badge/trafilatura-scraping-FF9F1C?style=for-the-badge" alt="trafilatura" />
   <img src="https://img.shields.io/badge/ChromaDB-vector%20store-FF6B6B?style=for-the-badge" alt="ChromaDB" />
