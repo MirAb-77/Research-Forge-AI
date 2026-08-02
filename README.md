@@ -1,4 +1,4 @@
-# Research Forge AI
+<img width="2288" height="1374" alt="Homepage" src="docs/screenshots of Frontend/Homepage.png" /># Research Forge AI
 
 **Ask a question. Get back a report — every claim traceable to a real source, none of it hallucinated.**
 
@@ -35,19 +35,19 @@ Everything runs on infrastructure you own — no paid search API, no paid embedd
 
 ## Screenshots
 
-> Images live in [`docs/screenshots/`](docs/screenshots) and are referenced by relative path — this is more reliable than pasted `user-attachments` links, which expire or 404 if the paste happens before the upload finishes. Save each screenshot with the filename shown below.
+> Images live in [`docs/screenshots of Frontend/`](docs/screenshots%20of%20Frontend) and are referenced by relative path — this is more reliable than pasted `user-attachments` links, which expire or 404 if the paste happens before the upload finishes. Save each screenshot with the filename shown below.
 
 **Landing page**
 
 | Home | Workflow | What it does |
 |---|---|---|
-| <img width="380" src="docs/screenshots/home.png" alt="Home page" /> | <img width="380" src="docs/screenshots/workflow.png" alt="Workflow diagram" /> | <img width="380" src="docs/screenshots/features.png" alt="Functionality grid" /> |
+| <img width="380" src="docs/screenshots of Frontend/Homepage.png" alt="Home page" /> | <img width="380" src="docs/screenshots of Frontend/Worfklow.png" alt="Workflow diagram" /> | <img width="380" src="docs/screenshots of Frontend/Functions.png" alt="Functionality grid" /> |
 
 **Research Ledger (the tool)**
 
 | User query | Fetching sources | Cited answer | PDF export |
 |---|---|---|---|
-| <img width="280" src="docs/screenshots/query.png" alt="User query" /> | <img width="280" src="docs/screenshots/pipeline-running.png" alt="Pipeline running" /> | <img width="280" src="docs/screenshots/cited-answer.png" alt="Cited answer" /> | <img width="280" src="docs/screenshots/pdf-export.png" alt="PDF report" /> |
+| <img width="280" src="docs/screenshots of Frontend/Query.png" alt="User query" /> | <img width="280" src="docs/screenshots of Frontend/Pipeline.png" alt="Pipeline running" /> | <img width="280" src="docs/screenshots of Frontend/Answer.png" alt="Cited answer" /> | <img width="280" src="docs/screenshots of Frontend/PdfReport.png" alt="PDF report" /> |
 
 ---
 
@@ -188,7 +188,7 @@ ai-research-assistant/
 ├── searxng-config/
 │   └── settings.yml           # enables SearXNG's JSON API (off by default)
 ├── docs/
-│   └── screenshots/           # drop screenshots here (see its own README)
+│   └── screenshots of Frontend/  # drop screenshots here (see its own README)
 ├── config/                    # Django project settings, urls, celery app
 ├── apps/
 │   ├── search/                 # ① ② — ResearchQuery/SourceDocument models,
