@@ -1,8 +1,15 @@
 # Research Forge AI
 
-**A self-hosted research pipeline that turns a plain-language question into a citation-backed, exportable report.**
+**Ask a question. Get back a report — every claim traceable to a real source, none of it hallucinated.**
 
-SearXNG (meta-search) → trafilatura (extraction) → ChromaDB (retrieval) → Groq/Llama (citation-enforced generation) → Markdown/PDF/DOCX (export), orchestrated by Django + Celery.
+Research Forge AI is a self-hosted research pipeline: it fans your question out across 70+ search engines, scrapes and cleans the results, retrieves the most relevant passages, and forces the LLM to answer *only* from what it retrieved — citing `[n]` back to a numbered source for every sentence. No answer ships without a receipt.
+
+```
+question ─▶ SearXNG (search) ─▶ trafilatura (clean text) ─▶ ChromaDB (retrieve)
+         ─▶ Groq / Llama (citation-enforced answer) ─▶ Markdown / PDF / DOCX
+```
+
+Everything runs on infrastructure you own — no paid search API, no paid embedding API, no vendor lock-in on the LLM. Django serves the API, Celery runs the pipeline in the background, and the whole thing ships as one Docker Compose stack.
 
 <p>
   <img src="https://img.shields.io/badge/Python-3.11-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
@@ -30,17 +37,19 @@ SearXNG (meta-search) → trafilatura (extraction) → ChromaDB (retrieval) → 
 
 ## Screenshots
 
+> Images live in [`docs/screenshots/`](docs/screenshots) and are referenced by relative path — this is more reliable than pasted `user-attachments` links, which expire or 404 if the paste happens before the upload finishes. Save each screenshot with the filename shown below.
+
 **Landing page**
 
 | Home | Workflow | What it does |
 |---|---|---|
-| <img width="380" src="https://github.com/user-attachments/assets/aca06a80-1005-4a66-9a0d-3675254f698d" alt="Home page" /> | <img width="380" src="https://github.com/user-attachments/assets/c24a1383-1ab7-4105-9b1c-841ff11f87c4" alt="Workflow diagram" /> | <img width="380" src="https://github.com/user-attachments/assets/ce77fc5e-224a-49fe-bfae-5e2dcb122975" alt="Functionality grid" /> |
+| <img width="380" src="docs/screenshots/home.png" alt="Home page" /> | <img width="380" src="docs/screenshots/workflow.png" alt="Workflow diagram" /> | <img width="380" src="docs/screenshots/features.png" alt="Functionality grid" /> |
 
 **Research Ledger (the tool)**
 
 | User query | Fetching sources | Cited answer | PDF export |
 |---|---|---|---|
-| <img width="280" src="https://github.com/user-attachments/assets/123536ec-cb0d-4eed-8eca-ba5385447de4" alt="User query" /> | <img width="280" src="https://github.com/user-attachments/assets/f61b642d-d039-4234-b295-e0cf705da0f6" alt="Pipeline running" /> | <img width="280" src="https://github.com/user-attachments/assets/d6e559f2-578c-4876-b7f8-38e6a2f25d21" alt="Cited answer" /> | <img width="280" src="https://github.com/user-attachments/assets/fda184f9-1a03-4c80-9b0f-9f82f935b6cd" alt="PDF report" /> |
+| <img width="280" src="docs/screenshots/query.png" alt="User query" /> | <img width="280" src="docs/screenshots/pipeline-running.png" alt="Pipeline running" /> | <img width="280" src="docs/screenshots/cited-answer.png" alt="Cited answer" /> | <img width="280" src="docs/screenshots/pdf-export.png" alt="PDF report" /> |
 
 ---
 
